@@ -22,31 +22,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sysexits.h>
+# include <stdint.h>
 #include <time.h>
 #include <unistd.h>
 #include "./libft/libft.h"
 
 size_t ft_printf(char *format, ...);
 
-typedef struct s_file_list
-{
-	char *content;
-	struct s_file_list *next;
-} t_file_list;
-
 typedef struct s_info
 {
 	bool		isfile;
 	char		*path;
 	char		*name;
+	struct stat filestat;
+	time_t		time;
+	int			level;
 }				t_info;
 
 typedef struct s_global_list
 {
 	struct s_info			info;
-	struct s_global_list *folders;
-	struct s_file_list *files;
-	struct s_global_list *next;
+	struct s_global_list	*next;
 } t_global_list;
 
 
@@ -59,9 +55,6 @@ typedef struct s_global_list
 	bool l;
 } t_flags;
 
- void	ft_lstpush_global(t_global_list **lst, t_global_list *new);
 void		ft_lstpush_folder(t_global_list **lst, t_global_list *new);
 t_global_list		*ft_lstnew_folder(t_info templink);
-void		ft_lstpush_file(t_global_list **lst, t_file_list *new);
-t_file_list			*ft_lstnew_file(t_info templink);
 #endif

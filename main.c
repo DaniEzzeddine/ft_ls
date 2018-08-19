@@ -9,8 +9,9 @@
 /*   Updated: 2018/08/07 22:15:36 by dezzeddi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "ft_ls.h"
+
+void ft_recursive(t_flags flags,t_info prevfolder);
 
 static void print_permissions(mode_t mode)
 {
@@ -26,28 +27,75 @@ static void print_permissions(mode_t mode)
 	printf("   ");
 }
 
+int ft_count_max_length(t_global_list **all_files)
+{
+	int max_length;
+	t_global_list *temp;
+	t_info info;
+
+	max_length = 0;
+	temp = *all_files;
+	while (temp)
+	{
+		info = temp->info;
+		if (ft_strlen(info.name) > max_length)
+			max_length = ft_strlen(info.name);
+		temp = temp->next;
+	}
+	return (max_length);
+}
+
 void print_list(t_flags flags, t_global_list **all_files)
 {
-	t_global_list *tempfolder;
-	t_file_list		*tempfile;
+	t_global_list 	*tempfolder;
+	t_info			info;
+	int				max_length;
 
-	while ((*all_files)->next)
+	max_length = 0;
+	tempfolder = (*all_files);
+	max_length = ft_count_max_length(all_files);
+	while (tempfolder)
 	{
-		printf("%s:\n", (*all_files)->info.name);
-		tempfile = (*all_files)->files;
-		while (tempfile->next)
-		{
-			printf("\t%s,\n", tempfile->content);
-			tempfile = tempfile->next;
-		}
-		tempfolder = (*all_files)->folders;
-		while (tempfolder->next)
-		{
-			printf("\t");
-			print_list(flags, &tempfolder);
-			tempfolder = tempfolder->next;
-		}
+		info = tempfolder->info;
+		printf("%*s",max_length, info.name);
+		tempfolder = tempfolder->next;
 	}
+}
+void swap(t_global_list *p1, t_global_list *p2)
+{
+	t_info temp;
+
+	temp = p1->info;		
+	p1->info = p2->info;
+	p2->info = temp; 
+}
+
+void selection_sort(struct s_global_list *head)
+{
+	t_global_list *traverse;
+	t_global_list *start;
+	t_global_list *min;
+	t_info			 	min_data;
+	t_info			traverse_data;
+ 
+	start = head;
+    while (start->next)
+    {
+		// printf("%s\n", start->info.name);
+		min = start;
+		traverse = start->next;
+		while(traverse)
+		{
+			min_data = min->info;
+			traverse_data = traverse->info;
+			if (min_data.time < traverse_data.time)
+				min = traverse;
+			traverse = traverse->next;
+		}
+		swap(start, min);
+		start = start->next;
+	}
+	printf("\n");
 }
 
 t_flags parse_flags(int argc, char **argv)
@@ -72,120 +120,111 @@ t_flags parse_flags(int argc, char **argv)
 	return (flags);
 }
 
-void ft_iterative(int argc, char **argv, t_flags flags, char *path)
-{
-	struct dirent *file;
-	DIR *direct;
-	t_list *all_files;
-
-	direct = opendir(path);
-	while ((file = readdir(direct)))
-	{
-		ft_lstpush(&all_files, ft_lstnew((void *)file, sizeof(struct dirent)));
-	}
-}
-
-void ft_recursive(t_global_list **all_files, t_flags flags, char *path)
+void ft_iterative(t_flags flags, t_info prevfolder)
 {
 	DIR *directory;
 	struct dirent *file;
-	struct stat fileStat;
+	struct stat filestat;
 	t_info	templink;
+	t_global_list	**all_files;
 
-	(*all_files) = (t_global_list *)ft_memalloc(sizeof(t_global_list));
-	if ((directory = opendir(path)))
+	all_files = (t_global_list**)ft_memalloc(sizeof(t_global_list*));	
+	if ((directory = opendir(prevfolder.path)))
 	{
 		while ((file = readdir(directory)))
 		{
-			if (file->d_name[0] != '.')
-			{
-				templink.path = ft_strjoin(ft_strjoin(ft_strdup(path), ft_strdup("/")), ft_strdup(file->d_name));
-				templink.name = ft_strdup(file->d_name);
-				stat(templink.path, &fileStat);
-				if (S_ISDIR(fileStat.st_mode))
-				{
-					ft_lstpush_global(all_files, ft_lstnew_folder(templink));
-					ft_recursive(&((*all_files)->folders), flags, templink.path);
-
-				}
-				else
-				{
-					ft_lstpush_file(all_files, ft_lstnew_file(templink));
-
-				}
-			}
+			templink.path = ft_strjoin(ft_strjoin(ft_strdup(prevfolder.path), ft_strdup("/")), ft_strdup(file->d_name));
+			templink.name = ft_strdup(file->d_name);
+			if ((stat(templink.path, &filestat) != -1) && S_ISDIR(filestat.st_mode))
+				templink.isfile = false;
+			else
+				templink.isfile = true;
+			templink.filestat = filestat;
+			templink.time = filestat.st_mtime;
+			templink.level = prevfolder.level + 1;
+			if (templink.name[0] != '.' || flags.a)
+				ft_lstpush_folder(all_files, ft_lstnew_folder(templink));
 		}
-		// temp = (*all_files)->content;
-		// printf("%s:\n", temp->content);
-		// temp = temp->next;
-		// while (temp->next)
-		// {
-		// 	printf("\t%s\n", temp->content);
-		// 	temp = temp->next;
-		// }
+	if (flags.t)
+		selection_sort(*all_files);
+	print_list(flags, all_files);
 	}
 }
 
-// struct dirent	*file;
-// DIR				*direct;
-// char			*temppath;
-// t_data			*files_in_dir;
-// struct stat		fileStat;
-// t_data			temp;
 
-// files_in_dir =ft_memalloc(sizeof(t_data*));
-// stat(path, &fileStat);
-// if ((direct = opendir(path)) && (S_ISDIR(fileStat.st_mode)))
-// {
-// 	files_in_dir->name_of_the_folder = ft_strdup(path);
-// 	while ((file = readdir(direct)))
-// 	{
-// 		if (file->d_name[0] != '.')
-// 		{
-// 			temppath = ft_strjoin(ft_strdup(path), ft_strdup("/"));
-// 			temppath = ft_strjoin(temppath, ft_strdup(file->d_name));
-// 			ft_lstadd(&(files_in_dir->files_in_folder), ft_lstnew(temppath, ft_strlen(temppath)));
-// 			printf("%s\n", temppath);
-// 			ft_recursive(all_files, flags, temppath);
-// 		}
-// 	}
-// 	ft_lstadd(all_files, ft_lstnew(&files_in_dir, sizeof(t_data*)));
-// 	while((*all_files)->next)
-// 	{
-// 		ft_memcpy((void *)(&temp), (*all_files)->content, sizeof(t_data));
-// 		printf("%s", temp.name_of_the_folder);
-// 		(*all_files) = (*all_files)->next;
-// 	}
-// free(files_in_dir);
-// closedir(direct);
-// }
+void filedir_sort(t_flags flags, t_global_list **all_files)
+{
+	t_global_list *start;
+
+	start = (*all_files);
+	while(start)
+	{
+		if (!(start->info.isfile) && (ft_strcmp(start->info.name,".")) && (ft_strcmp(start->info.name,"..")))
+		{
+			printf("\n%s:\n", start->info.path);
+			ft_recursive(flags, start->info);
+		}
+		start = start->next;
+	}
+
+}
+
+void ft_recursive(t_flags flags,t_info prevfolder)
+{
+	DIR *directory;
+	struct dirent *file;
+	struct stat filestat;
+	t_info	templink;
+	t_global_list	**all_files;
+
+	all_files = (t_global_list**)ft_memalloc(sizeof(t_global_list*));	
+	if ((directory = opendir(prevfolder.path)))
+	{
+		while ((file = readdir(directory)))
+		{
+			templink.path = ft_strjoin(ft_strjoin(ft_strdup(prevfolder.path), ft_strdup("/")), ft_strdup(file->d_name));
+			templink.name = ft_strdup(file->d_name);
+			if ((stat(templink.path, &filestat) != -1) && S_ISDIR(filestat.st_mode))
+				templink.isfile = false;
+			else
+				templink.isfile = true;
+			templink.filestat = filestat;
+			templink.time = filestat.st_mtime;
+			templink.level = prevfolder.level + 1;
+			if (templink.name[0] != '.' || flags.a)
+				ft_lstpush_folder(all_files, ft_lstnew_folder(templink));
+		}
+	if (flags.t)
+		selection_sort(*all_files);
+	print_list(flags, all_files);
+	filedir_sort(flags, all_files);
+	}
+}
+
 
 int main(int argc, char **argv)
 {
 	t_flags flags;
 	int i;
-	t_global_list **all_files;
 	t_info	templink;
 
+	
 	flags = parse_flags(argc, argv);
 	i = optind;
-	all_files = (t_global_list **)ft_memalloc(sizeof(t_global_list*));
-	(*all_files) = (t_global_list *)ft_memalloc(sizeof(t_global_list));
 	while (i <= argc)
 	{
 		if (!argv[i])
 			templink.name = ft_strdup(".");
 		else
-			templink.path = ft_strjoin(ft_strdup("./"), ft_strdup(argv[i]));
+			templink.name = ft_strdup(argv[i]);
+		templink.path = templink.name;
+		templink.level = 0;
+		printf("\n%s:\n", templink.path);
 		if (flags.c_r)
-		{
-			ft_lstpush_global(all_files, ft_lstnew_folder(templink));
-			ft_recursive(&((*all_files)->folders), flags, templink.name);
-		}
+			ft_recursive(flags, templink);
 		else
-			ft_iterative(argc, argv, flags, templink.name);
+			ft_iterative(flags, templink);
 		i++;
 	}
-	print_list(flags, all_files);
 	return (0);
 }

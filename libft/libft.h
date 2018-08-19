@@ -14,6 +14,7 @@
 # define LIBFT_H
 # include <string.h>
 # include <unistd.h>
+# include <stdint.h>
 # include <stdlib.h>
 
 size_t				ft_printf(char *format, ...);
