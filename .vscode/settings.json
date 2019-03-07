@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "ft_ls.h": "c",
+        "ioctl.h": "c",
+        "pwd.h": "c"
+    },
+    "editor.renderWhitespace": "all",
+    "editor.insertSpaces": false,
+    "editor.detectIndentation": false
+}

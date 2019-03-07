@@ -1,4 +1,3 @@
-
 NAME		= libft.a
 
 CFLAGS		= -Wall -Werror -Wextra
@@ -71,19 +70,18 @@ FILES		= ft_memset.c \
 				ft_strrealloc.c \
 				ft_strndup.c \
 				ft_lstpush.c \
-				ft_lstlen.c
+				ft_lstlen.c \
+				ft_printf/*.c
 
 SRCS		= $(FILES)
-OBJ			= $(FILES:%.c=%.o)
+OBJ			= *.o ft_printf/*.o
 
 all: $(NAME)
-
-$(NAME): $(OBJ)
-	@ar rcs $(NAME) $(OBJ)
+	
+$(NAME):
+	gcc -c $(CFLAGS) $(SRCS) -I ft_printf/
+	@ar rcs $(NAME) *.o
 	@ranlib $(NAME)
-
-$(OBJ): $(SRCS)
-	gcc -c $(CFLAGS) $(SRCS)
 
 clean:
 	rm -f $(OBJ)

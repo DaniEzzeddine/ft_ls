@@ -6,7 +6,7 @@
 /*   By: dezzeddi <dezzeddi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/08 18:46:48 by dezzeddi          #+#    #+#             */
-/*   Updated: 2018/08/02 20:14:37 by dezzeddi         ###   ########.fr       */
+/*   Updated: 2018/08/20 14:16:00 by dezzeddi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 # include <stdint.h>
 # include <stdlib.h>
 
-size_t				ft_printf(char *format, ...);
+int					ft_printf(char *format, ...);
 
 void				ft_putchar(char c);
 void				ft_putstr(char const *str);

@@ -1,55 +1,38 @@
-CC = gcc
-CFLAGS = -Wall -Wextra -Werror -I -g
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: dezzeddi <dezzeddi@student.42.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2018/08/20 14:19:43 by dezzeddi          #+#    #+#              #
+#    Updated: 2019/02/28 18:24:56 by dezzeddi         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 NAME = ft_ls
 
-_DEPS_MD5 = ft_ls.h
-DEPS = $(LS_DIR)/$(_DEPS_LS)
+SRC = main.c  ulits.c list_function.c print_functions.c sort_functions.c ft_ls.c ft_mergesort.c
 
-SRC = ft_getopt.c \
+FLAGS = -Wall -Wextra -Werror -g
 
-LS_DIR = ./ft_ls
-LS_SRC =main.c \
-		ft_getopt \
-		ft_ls.c \
-		
-LS = $(patsubst %, $(LS_DIR)/%, $(LS_SRC))
+OBJS = $(SRC:.c=.o)
 
-SRC_OBJ =$(SRC:.c=.o)
-LS_OBJ = $(LS:.c=.o)
-
-OBJ = $(SRC_OBJ) $(LS_OBJ)
-LIBS = ./ft_printf/libftprintf.a
+LIBFT = libft
 
 all: $(NAME)
 
-$(LIBS):
-	@+$(MAKE) -C ./libft
-
-
-%.o: %.c $(DEPS)
-	@echo "\033[0;32m\c"
-	$(CC) -g -c -o $@ $< $(CFLAGS)
-	@echo "\033[0m\c"
-
-$(NAME): $(OBJ) $(LIBS)
-	@echo "\033[0;35m\c"
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
-	@echo "\033[0m\c"
-
-ls: $(LS_OBJ) $(LIBS)
-	@echo "\033[0;34m\c"
-	$(CC) -g -o ft_ssl_$@ $^ $(CFLAGS) $(LIBS)
-	@echo "\033[0m\c"
+$(NAME):
+	make -C $(LIBFT)
+	gcc $(FLAGS) -c $(SRC)
+	gcc $(FLAGS) $(OBJS) -L./libft -lft -o $(NAME)
 
 clean:
-	@/bin/rm -f $(OBJ)
-	@+$(MAKE) clean -C ./libft
+	rm -f $(OBJS)
+	make clean -C $(LIBFT)
 
 fclean: clean
-	@/bin/rm -f $(NAME)
-	@+$(MAKE) fclean -C ./libft
-
+	rm -f $(NAME)
+	rm -f $(LIBFT)/libft.a
 
 re: fclean all
-
-.PHONY: clean fclean re
