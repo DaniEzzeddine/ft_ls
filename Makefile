@@ -6,13 +6,13 @@
 #    By: dezzeddi <dezzeddi@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/08/20 14:19:43 by dezzeddi          #+#    #+#              #
-#    Updated: 2019/02/28 18:24:56 by dezzeddi         ###   ########.fr        #
+#    Updated: 2019/03/08 18:43:00 by dezzeddi         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = ft_ls
 
-SRC = main.c  ulits.c list_function.c print_functions.c sort_functions.c ft_ls.c ft_mergesort.c
+SRC = ft_ls.c parse_flags.c print_functions.c ft_lstfuncs.c sort_functions.c ft_mergesort.c ft_recursive.c utils.c
 
 FLAGS = -Wall -Wextra -Werror -g
 
@@ -23,8 +23,8 @@ LIBFT = libft
 all: $(NAME)
 
 $(NAME):
-	make -C $(LIBFT)
-	gcc $(FLAGS) -c $(SRC)
+	make -C $(LIBFT) 
+	gcc $(FLAGS) -c $(SRC) -I./
 	gcc $(FLAGS) $(OBJS) -L./libft -lft -o $(NAME)
 
 clean:

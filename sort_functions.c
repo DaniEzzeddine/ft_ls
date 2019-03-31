@@ -6,13 +6,13 @@
 /*   By: dezzeddi <dezzeddi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/28 16:44:47 by dezzeddi          #+#    #+#             */
-/*   Updated: 2019/02/28 16:44:50 by dezzeddi         ###   ########.fr       */
+/*   Updated: 2019/03/09 02:31:05 by dezzeddi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ls.h"
 
-void						swap(t_global_list *p1, t_global_list *p2)
+void						swap(t_file_list *p1, t_file_list *p2)
 {
 	t_info	temp;
 
@@ -21,11 +21,11 @@ void						swap(t_global_list *p1, t_global_list *p2)
 	p2->info = temp;
 }
 
-void						lex_sort(struct s_global_list *head)
+void						lex_sort(t_file_list *head)
 {
-	t_global_list		*traverse;
-	t_global_list		*start;
-	t_global_list		*max;
+	t_file_list		*traverse;
+	t_file_list		*start;
+	t_file_list		*max;
 
 	start = head;
 	while (start->next)
@@ -43,7 +43,7 @@ void						lex_sort(struct s_global_list *head)
 	}
 }
 
-int							time_sort(t_global_list *one, t_global_list *two)
+int							time_sort(t_file_list *one, t_file_list *two)
 {
 	if (one->info.filestat.st_mtimespec.tv_sec ==
 			two->info.filestat.st_mtimespec.tv_sec)
@@ -59,11 +59,11 @@ int							time_sort(t_global_list *one, t_global_list *two)
 			two->info.filestat.st_mtimespec.tv_sec);
 }
 
-t_global_list				*ft_reverse_lst(t_global_list *lst)
+t_file_list					*ft_reverse_lst(t_file_list *lst)
 {
-	t_global_list		*a;
-	t_global_list		*b;
-	t_global_list		*c;
+	t_file_list		*a;
+	t_file_list		*b;
+	t_file_list		*c;
 
 	a = NULL;
 	b = lst;
@@ -78,11 +78,11 @@ t_global_list				*ft_reverse_lst(t_global_list *lst)
 	return (a);
 }
 
-void						get_sort(t_flags flags, t_global_list **all_files)
+void						get_sort(t_file_list **all_files)
 {
 	lex_sort(*all_files);
-	if (flags.t)
+	if (g_flags.t)
 		ft_mergesort(all_files);
-	if (flags.r)
+	if (g_flags.r)
 		*all_files = ft_reverse_lst(*all_files);
 }

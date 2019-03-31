@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: dezzeddi <dezzeddi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/07/12 15:11:59 by dezzeddi          #+#    #+#             */
-/*   Updated: 2019/03/05 16:16:52 by dezzeddi         ###   ########.fr       */
+/*   Created: 2019/03/09 02:11:45 by dezzeddi          #+#    #+#             */
+/*   Updated: 2019/03/09 02:26:31 by dezzeddi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@
 # include <unistd.h>
 # include "./libft/libft.h"
 
-extern int					g_total;
+int					g_total;
 
 typedef struct				s_info
 {
@@ -44,11 +44,11 @@ typedef struct				s_info
 	int						x;
 }							t_info;
 
-typedef struct				s_global_list
+typedef struct				s_file_list
 {
 	struct s_info			info;
-	struct s_global_list	*next;
-}							t_global_list;
+	struct s_file_list		*next;
+}							t_file_list;
 
 typedef struct				s_flags
 {
@@ -57,28 +57,34 @@ typedef struct				s_flags
 	bool					c_r;
 	bool					a;
 	bool					l;
+	int						i;
 }							t_flags;
 
-void						free_link(t_info templink);
-void						ft_lstpush_folder(t_global_list **lst,
-							t_global_list *new);
-t_global_list				*ft_lstnew_folder(t_info templink);
-void						get_sort(t_flags flags, t_global_list **all_files);
-void						ft_recursive(t_flags flags, t_info prevfolder);
-void						ft_iterative(t_flags flags, t_info prevfolder);
-void						print_list(t_flags flags,
-							t_global_list **all_files);
-t_info						build_struct_info(char *name, char *path);
-void						get_dirs(t_flags flags,
-							t_global_list **all_files);
-struct s_global_list		*ft_sortedmerge(struct s_global_list *a,
-							struct s_global_list *b);
-void						ft_frontbacksplit(struct s_global_list *source,
-							struct s_global_list **frontref,
-							struct s_global_list **backref);
-void						free_list(struct s_global_list **all_files);
-void						ft_mergesort(struct s_global_list **headref);
-int							time_sort(t_global_list *one, t_global_list *two);
-void						free_reit(DIR *directory, struct s_global_list **allfiles);
+void						sort_print(t_file_list *files);
+void						get_sort(t_file_list **all_files);
+void						ft_mergesort(t_file_list **headref);
+t_file_list					*ft_sortedmerge(t_file_list *a,\
+t_file_list *b);
+void						ft_frontbacksplit(t_file_list *source,\
+t_file_list **frontref, t_file_list **backref);
+int							time_sort(t_file_list *one, t_file_list *two);
+void						print_list(t_file_list *all_files);
+void						open_dirs(int argc, t_file_list *dirs);
+void						ft_recursive(int argc, t_file_list *all_files);
+t_flags						ft_parse_flags(int argc, char **argv);
+void						free_list(t_file_list *node);
 
+void						ft_lstpush_file(t_file_list **lst,\
+t_file_list *new);
+t_file_list					*ft_lstnew_file(t_info info);
+
+t_info						get_info(char *path, char *name);
+
+int							is_file_exists(const char *path);
+void						wrong_usage();
+
+void						quick_sort(char **files, int left, int right);
+
+int					g_max;
+t_flags				g_flags;
 #endif

@@ -5,85 +5,92 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: dezzeddi <dezzeddi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/02/28 16:45:16 by dezzeddi          #+#    #+#             */
-/*   Updated: 2019/03/05 19:20:19 by dezzeddi         ###   ########.fr       */
+/*   Created: 2019/03/09 02:08:21 by dezzeddi          #+#    #+#             */
+/*   Updated: 2019/03/09 02:25:01 by dezzeddi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ls.h"
 
-
-void				ft_iterative(t_flags flags, t_info prevfolder)
+static t_file_list				*get_files(t_file_list *files,\
+char **argv, int i)
 {
-	DIR						*directory;
-	struct dirent			*file;
-	t_info					templink;
-	t_global_list			**all_files;
+	int	j;
 
-	all_files = (t_global_list **)ft_memalloc(sizeof(t_global_list *));
-	g_total = 0;
-	if ((directory = opendir(prevfolder.path)))
+	j = 0;
+	while (argv[i])
 	{
-		while ((file = readdir(directory)))
-		{
-			if (file->d_name[0] != '.' || flags.a)
-			{
-				templink = build_struct_info(file->d_name, prevfolder.path);
-				g_total += templink.filestat.st_blocks;
-				ft_lstpush_folder(all_files, ft_lstnew_folder(templink));
-			}
-		}
+		ft_lstpush_file(&files, ft_lstnew_file(get_info("", argv[i])));
+		i++;
+		j++;
 	}
-	get_sort(flags, all_files);
-	if (flags.l)
-		ft_printf("total %d\n", g_total);
-	print_list(flags, all_files);
-	free_reit(directory, all_files);
+	if (j == 0)
+		ft_lstpush_file(&files, ft_lstnew_file(get_info("", ".")));
+	return (files);
 }
 
-void				get_dirs(t_flags flags, t_global_list **all_files)
+void							sort_print(t_file_list *files)
 {
-	t_global_list *start;
+	get_sort(&files);
+	print_list(files);
+}
 
-	start = (*all_files);
-	g_total = 0;
-	while (start)
+void							render_files(char **non_files, int argc,\
+t_file_list *files, t_file_list *dirs)
+{
+	while (*non_files)
 	{
-		if (!(start->info.isfile) && (ft_strcmp(start->info.name, "."))\
-		&& (ft_strcmp(start->info.name, "..")))
-		{
-			if (start->info.name[0] != '.')
-				ft_printf("\n%s:\n", start->info.path);
-			ft_recursive(flags, start->info);
-		}
-		start = start->next;
+		ft_printf("ls: %s: No such file or directory\n", *non_files);
+		free(*non_files);
+		non_files++;
+	}
+	if (files)
+	{
+		sort_print(files);
+		ft_printf("\n");
+		free_list(files);
+	}
+	if (dirs)
+	{
+		open_dirs(argc, dirs);
+		free_list(dirs);
 	}
 }
 
-void				ft_recursive(t_flags flags, t_info prevfolder)
+void							file_dir_sort(int argc, t_file_list *all_files)
 {
-	DIR				*directory;
-	struct dirent	*file;
-	t_info			templink;
-	t_global_list	**all_files;
+	char			*not_files[argc];
+	t_file_list		*files;
+	t_file_list		*dirs;
+	int				i;
 
-	all_files = (t_global_list **)ft_memalloc(sizeof(t_global_list *));
-	if ((directory = opendir(prevfolder.path)))
+	i = 0;
+	files = NULL;
+	dirs = NULL;
+	while (all_files)
 	{
-		while ((file = readdir(directory)))
-		{
-			if (file->d_name[0] != '.' || flags.a)
-			{
-				templink = build_struct_info(file->d_name, prevfolder.path);
-				g_total += templink.filestat.st_blocks;
-				ft_lstpush_folder(all_files, ft_lstnew_folder(templink));
-			}
-		}
-		get_sort(flags, all_files);
-		if (flags.l)
-			ft_printf("total %d\n", g_total);
-		print_list(flags, all_files);
-		get_dirs(flags, all_files);
-		// free_reit(directory, all_files);
+		if (!(is_file_exists(all_files->info.path)))
+			not_files[i++] = ft_strdup(all_files->info.name);
+		else if (all_files->info.isfile)
+			ft_lstpush_file(&files, ft_lstnew_file(all_files->info));
+		else
+			ft_lstpush_file(&dirs, ft_lstnew_file(all_files->info));
+		all_files = all_files->next;
 	}
+	quick_sort(not_files, 0, i - 1);
+	not_files[i] = NULL;
+	render_files(not_files, argc, files, dirs);
+}
+
+int								main(int argc, char **argv)
+{
+	int				i;
+	t_file_list		*files;
+
+	files = NULL;
+	g_max = 0;
+	g_flags = ft_parse_flags(argc, argv);
+	i = g_flags.i;
+	files = get_files(files, argv, i);
+	file_dir_sort(argc, files);
 }

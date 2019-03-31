@@ -6,7 +6,7 @@
 /*   By: dezzeddi <dezzeddi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/29 01:52:27 by dezzeddi          #+#    #+#             */
-/*   Updated: 2019/02/28 16:51:39 by dezzeddi         ###   ########.fr       */
+/*   Updated: 2019/03/09 02:34:29 by dezzeddi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	ft_lstpush(t_list **lst, t_list *new)
 	if (!current)
 	{
 		*lst = new;
-		return;
+		return ;
 	}
 	while (current->next)
 		current = current->next;

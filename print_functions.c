@@ -6,7 +6,7 @@
 /*   By: dezzeddi <dezzeddi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/28 16:44:58 by dezzeddi          #+#    #+#             */
-/*   Updated: 2019/03/04 14:47:34 by dezzeddi         ###   ########.fr       */
+/*   Updated: 2019/03/09 02:30:50 by dezzeddi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,19 +91,29 @@ void					print_permissions(t_info info)
 	free(perms);
 }
 
-void					print_list(t_flags flags, t_global_list **all_files)
+void					print_list(t_file_list *all_files)
 {
-	t_global_list	*tempfolder;
-	t_info			info;
+	int				i;
+	struct ttysize	ts;
 
-	tempfolder = (*all_files);
-	while (tempfolder)
+	ioctl(0, TIOCGSIZE, &ts);
+	i = 0;
+	if (g_flags.l)
+		ft_printf("total %d\n", g_total);
+	while (all_files)
 	{
-		info = tempfolder->info;
-		if (flags.l)
-			print_permissions(info);
+		if (g_flags.l)
+			print_permissions(all_files->info);
 		else
-			ft_printf("%s\n", info.name);
-		tempfolder = tempfolder->next;
+			ft_printf("%-*s", g_max + 3, all_files->info.name);
+		all_files = all_files->next;
+		if (i == ((ts.ts_cols / (g_max + 3)) - 1) && !g_flags.l)
+		{
+			write(1, "\n", 1);
+			i = 0;
+		}
+		i++;
 	}
+	write(1, "\n", 1);
+	g_max = 0;
 }

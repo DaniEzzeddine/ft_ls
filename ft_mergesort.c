@@ -6,17 +6,17 @@
 /*   By: dezzeddi <dezzeddi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/28 16:45:09 by dezzeddi          #+#    #+#             */
-/*   Updated: 2019/02/28 18:16:47 by dezzeddi         ###   ########.fr       */
+/*   Updated: 2019/03/09 02:16:13 by dezzeddi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ls.h"
 
-void							ft_mergesort(struct s_global_list **headref)
+void							ft_mergesort(t_file_list **headref)
 {
-	t_global_list				*head;
-	t_global_list				*a;
-	t_global_list				*b;
+	t_file_list				*head;
+	t_file_list				*a;
+	t_file_list				*b;
 
 	head = *headref;
 	if ((head == NULL) || (head->next == NULL))
@@ -27,10 +27,10 @@ void							ft_mergesort(struct s_global_list **headref)
 	*headref = ft_sortedmerge(a, b);
 }
 
-struct s_global_list			*ft_sortedmerge(struct s_global_list *a,\
-struct s_global_list *b)
+t_file_list						*ft_sortedmerge(t_file_list *a,\
+t_file_list *b)
 {
-	t_global_list				*result;
+	t_file_list				*result;
 
 	result = NULL;
 	if (a == NULL)
@@ -50,11 +50,11 @@ struct s_global_list *b)
 	return (result);
 }
 
-void							ft_frontbacksplit(struct s_global_list *source,\
-struct s_global_list **frontref, struct s_global_list **backref)
+void							ft_frontbacksplit(t_file_list *source,\
+t_file_list **frontref, t_file_list **backref)
 {
-	t_global_list				*fast;
-	t_global_list				*slow;
+	t_file_list				*fast;
+	t_file_list				*slow;
 
 	slow = source;
 	fast = source->next;
