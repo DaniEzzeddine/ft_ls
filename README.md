@@ -1,3 +1,5 @@
+![ft_ls.gif](https://github.com/DaniEzzeddine/printf/blob/master/ft_ls.gif)
+
 # ft_ls
 Implementation of Unix command "ls", written in C
 
